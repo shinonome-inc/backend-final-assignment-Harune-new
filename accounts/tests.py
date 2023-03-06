@@ -45,6 +45,7 @@ class TestSignupView(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertFalse(User.objects.filter(username=invalid_data["username"]).exists())
+        self.assertFalse(form.is_valid())
         self.assertIn("このフィールドは必須です。", form.errors["username"])
         self.assertIn("このフィールドは必須です。", form.errors["email"])
         self.assertIn("このフィールドは必須です。", form.errors["password1"])
