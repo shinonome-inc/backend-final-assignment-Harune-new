@@ -42,8 +42,6 @@ INSTALLED_APPS = [
     "welcome.apps.WelcomeConfig",
 ]
 
-AUTH_USER_MODEL = "accounts.User"
-
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -126,3 +124,11 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+AUTH_USER_MODEL = "accounts.User"
+
+LOGIN_URL = "accounts:login"
+LOGOUT_URL = "accounts:logout"
+LOGIN_REDIRECT_URL = "tweets:home"
+LOGOUT_REDIRECT_URL = "accounts:login"
