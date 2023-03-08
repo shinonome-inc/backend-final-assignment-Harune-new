@@ -192,13 +192,13 @@ class TestSignupView(TestCase):
 class TestLoginView(TestCase):
     def setUp(self):
         self.url = reverse(settings.LOGIN_URL)
+        User.objects.create_user(username="testuser", email="test@test.com", password="testpassword")
 
     def test_success_get(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_success_post(self):
-        User.objects.create_user(username="testuser", email="test@test.com", password="testpassword")
         valid_data = {
             "username": "testuser",
             "password": "testpassword",
@@ -215,7 +215,7 @@ class TestLoginView(TestCase):
 
     def test_failure_post_with_not_exists_user(self):
         invalid_data = {
-            "username": "testuser",
+            "username": "testU",
             "password": "testpassword",
         }
         response = self.client.post(self.url, invalid_data)
@@ -241,6 +241,8 @@ class TestLoginView(TestCase):
 class TestLogoutView(TestCase):
     def setUp(self):
         self.url = reverse(settings.LOGOUT_URL)
+        user = User.objects.create_user(username="testuser", email="test@test.com", password="testpassword")
+        self.client.force_login(user)
 
     def test_success_post(self):
         response = self.client.post(self.url)
