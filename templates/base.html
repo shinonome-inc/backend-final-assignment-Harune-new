@@ -10,7 +10,8 @@
   <header>
     {% if request.user.is_authenticated %}
     <a href="{% url 'accounts:logout' %}">ログアウト</a>
-    <a href="{% url 'accounts:user_profile' user.username %}">{{ user.username }}</a>
+    <a href="{% url 'accounts:user_profile' user.username %}">プロフィール</a>
+    <a href="{% url 'tweets:home' %}">ホーム</a>
     {% else %}
     <a href="{% url 'accounts:login' %}">ログイン</a>
     <a href="{% url 'accounts:signup' %}">登録</a>
