@@ -9,9 +9,7 @@ from .models import Tweet
 class HomeView(LoginRequiredMixin, ListView):
     template_name = "tweets/home.html"
     model = Tweet
-
-    def get_queryset(self):
-        return self.model.objects.select_related("user")
+    queryset = model.objects.select_related("user")
 
 
 class TweetCreateView(LoginRequiredMixin, CreateView):
@@ -26,7 +24,6 @@ class TweetCreateView(LoginRequiredMixin, CreateView):
 
 class TweetDetailView(LoginRequiredMixin, DetailView):
     template_name = "tweets/detail.html"
-    allow_empty = False
     model = Tweet
 
 
