@@ -19,7 +19,7 @@ class TestHomeView(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
-        self.assertQuerysetEqual(response.context["object_list"], Tweet.objects.all(), ordered=False)
+        self.assertQuerysetEqual(response.context["tweet_list"], Tweet.objects.all(), ordered=False)
 
 
 class TestTweetCreateView(TestCase):

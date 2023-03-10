@@ -4,12 +4,12 @@
 
 {% block content %}
 <h1>Profile</h1>
-{% for item in tweet_list %}
+{% for tweet in tweet_list %}
 <div>
     <br>
-    <p>{{ item.user }} {{ item.created_at }}</p>
-    <p>{{ item.content }}</p>
-    <p><a href="{% url 'tweets:detail' item.pk %}">詳細</a></p>
+    <p>{{ tweet.user }} {{ tweet.created_at }}</p>
+    <p>{{ tweet.content }}</p>
+    <p><a href="{% url 'tweets:detail' tweet.pk %}">詳細</a></p>
 </div>
 {% endfor %}
 {% endblock %}
