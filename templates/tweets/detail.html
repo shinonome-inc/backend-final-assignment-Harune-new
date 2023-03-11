@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Detail{% endblock %}
+
+{% block content %}
+<h1>Tweet詳細</h1>
+<p><a href="{% url 'accounts:user_profile' tweet.user %}">{{ tweet.user }}</a> {{ tweet.created_at }}</p>
+<p>{{ tweet.content }}</p>
+{% if request.user == tweet.user %}
+<p><a href="{% url 'tweets:delete' tweet.pk %}">削除</a></p>
+{% endif %}
+{% endblock %}

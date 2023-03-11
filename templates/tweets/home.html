@@ -4,4 +4,13 @@
 
 {% block content %}
 <h1>Home</h1>
+<a href="{% url 'tweets:create' %}">新規作成</a>
+{% for tweet in tweet_list %}
+<div>
+    <br>
+    <p><a href="{% url 'accounts:user_profile' tweet.user %}">{{ tweet.user }}</a> {{ tweet.created_at }}</p>
+    <p>{{ tweet.content }}</p>
+    <p><a href="{% url 'tweets:detail' tweet.pk %}">詳細</a></p>
+</div>
+{% endfor %}
 {% endblock %}

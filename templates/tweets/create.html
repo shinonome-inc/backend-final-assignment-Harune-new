@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Cretae{% endblock %}
+
+{% block content %}
+<h1>Tweet作成</h1>
+<form method="post">
+    {{ form.as_p }}
+    {% csrf_token %}
+    <button type="submit">作成</button>
+</form>
+{% endblock %}
