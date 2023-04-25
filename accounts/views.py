@@ -1,12 +1,15 @@
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseBadRequest
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DetailView
+from django.views.generic import CreateView, DetailView, ListView, RedirectView
 
 from tweets.models import Tweet
 
 from .forms import SignupForm
+from .models import FriendShip
 
 User = get_user_model()
 
@@ -33,6 +36,55 @@ class UserProfileView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.object
-        context["tweet_list"] = Tweet.objects.select_related("user").filter(user=user)
+        profile_user = self.object
+        context["tweet_list"] = Tweet.objects.select_related("user").filter(user=profile_user)
+        context["is_following"] = self.request.user.followings.filter(username=profile_user).exists()
+        context["follower_count"] = profile_user.followers.count()
+        context["following_count"] = profile_user.followings.count()
         return context
+
+
+class FollowView(LoginRequiredMixin, RedirectView):
+    url = reverse_lazy("tweets:home")
+
+    def post(self, request, *args, **kwargs):
+        target_user = get_object_or_404(User, username=self.kwargs["username"])
+
+        if self.request.user == target_user:
+            return HttpResponseBadRequest()
+        else:
+            self.request.user.followings.add(target_user)
+
+        return super().post(request, *args, **kwargs)
+
+
+class UnfollowView(LoginRequiredMixin, RedirectView):
+    url = reverse_lazy("tweets:home")
+
+    def post(self, request, *args, **kwargs):
+        target_user = get_object_or_404(User, username=self.kwargs["username"])
+
+        if self.request.user == target_user:
+            return HttpResponseBadRequest()
+        else:
+            self.request.user.followings.remove(target_user)
+
+        return super().post(request, *args, **kwargs)
+
+
+class FollowingListView(LoginRequiredMixin, ListView):
+    template_name = "accounts/following_list.html"
+    model = FriendShip
+
+    def get_queryset(self):
+        list = self.model.objects.filter(following__username=self.kwargs["username"])
+        return list.order_by("-created_at")
+
+
+class FollowerListView(LoginRequiredMixin, ListView):
+    template_name = "accounts/follower_list.html"
+    model = FriendShip
+
+    def get_queryset(self):
+        list = self.model.objects.filter(follower__username=self.kwargs["username"])
+        return list.order_by("-created_at")
