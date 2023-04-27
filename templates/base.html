@@ -18,6 +18,11 @@
     {% endif %}
   </header>
   <div>
+    {% for message in messages %}
+    {{ message }}
+    {% endfor %}
+  </div>
+  <div>
     {% block content %}
     {% endblock %}
   </div>

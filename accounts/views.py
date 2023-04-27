@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseBadRequest
@@ -51,6 +52,7 @@ class FollowView(LoginRequiredMixin, RedirectView):
         target_user = get_object_or_404(User, username=self.kwargs["username"])
 
         if self.request.user == target_user:
+            messages.error(self.request, "自分自身をフォローできません")
             return HttpResponseBadRequest()
         else:
             self.request.user.followings.add(target_user)
@@ -65,6 +67,7 @@ class UnfollowView(LoginRequiredMixin, RedirectView):
         target_user = get_object_or_404(User, username=self.kwargs["username"])
 
         if self.request.user == target_user:
+            messages.error(self.request, "自分自身をフォロー解除できません")
             return HttpResponseBadRequest()
         else:
             self.request.user.followings.remove(target_user)
