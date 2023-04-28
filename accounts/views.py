@@ -80,7 +80,7 @@ class FollowingListView(LoginRequiredMixin, ListView):
     model = FriendShip
 
     def get_queryset(self):
-        list = self.model.objects.filter(following__username=self.kwargs["username"])
+        list = self.model.objects.filter(following__username=self.kwargs["username"]).select_related("follower")
         return list.order_by("-created_at")
 
 
@@ -89,5 +89,5 @@ class FollowerListView(LoginRequiredMixin, ListView):
     model = FriendShip
 
     def get_queryset(self):
-        list = self.model.objects.filter(follower__username=self.kwargs["username"])
+        list = self.model.objects.filter(follower__username=self.kwargs["username"]).select_related("following")
         return list.order_by("-created_at")
