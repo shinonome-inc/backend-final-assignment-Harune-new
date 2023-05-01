@@ -4,6 +4,19 @@
 
 {% block content %}
 <h1>Profile</h1>
+{% if user != request.user %}
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    {% if is_following %}
+    <button formaction="{% url 'accounts:unfollow' user.username %}" type="submit">フォローを解除</button>
+    {% else %}
+    <button formaction="{% url 'accounts:follow' user.username %}" type="submit">フォローする</button>
+    {% endif %}
+</form>
+{% endif %}
+<a href="{% url 'accounts:following_list' user.username %}">{{ following_count }} フォロー中</a>
+<a href="{% url 'accounts:follower_list' user.username %}">{{ follower_count }} フォロワー</a>
 {% for tweet in tweet_list %}
 <div>
     <br>

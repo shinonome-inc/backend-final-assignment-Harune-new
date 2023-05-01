@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1>フォロー一覧</h1>
+{% for friendship in friendship_list %}
+<div>
+    <p>{{ friendship.follower }}</p>
+</div>
+{% endfor %}
+{% endblock %}
