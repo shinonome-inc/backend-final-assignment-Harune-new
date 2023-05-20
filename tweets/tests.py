@@ -109,7 +109,7 @@ class TestTweetDeleteView(TestCase):
         response = self.client.post(reverse("tweets:delete", args=[Tweet.objects.order_by("pk").last().pk + 1]))
 
         self.assertEqual(response.status_code, 404)
-        self.assertTrue(Tweet.objects.all(), tweet_objects_all_former)
+        self.assertQuerysetEqual(Tweet.objects.all(), tweet_objects_all_former, ordered=False)
 
     def test_failure_post_with_incorrect_user(self):
         self.client.force_login(self.user2)
@@ -119,18 +119,56 @@ class TestTweetDeleteView(TestCase):
         self.assertTrue(User.objects.filter(pk=self.tweet1.pk).exists())
 
 
-# class TestLikeView(TestCase):
-#     def test_success_post(self):
+class TestLikeView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", email="test@test.com", password="testpassword")
+        self.client.force_login(self.user)
+        self.tweet = Tweet.objects.create(user=self.user, content="testcontent")
 
-#     def test_failure_post_with_not_exist_tweet(self):
+    def test_success_post(self):
+        response = self.client.post(reverse("tweets:like", args=[self.tweet.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(self.tweet, self.user.liking.all())
 
-#     def test_failure_post_with_liked_tweet(self):
+    def test_failure_post_with_not_exist_tweet(self):
+        count_former = self.user.liking.count()
+        response = self.client.post(reverse("tweets:like", args=[100]))
+
+        self.assertTrue(response.status_code, 404)
+        self.assertEqual(self.user.liking.count(), count_former)
+
+    def test_failure_post_with_liked_tweet(self):
+        self.tweet.liked_by.add(self.user)
+        count_former = self.tweet.liked_by.count()
+        response = self.client.post(reverse("tweets:like", args=[self.tweet.pk]))
+
+        self.assertTrue(response.status_code, 200)
+        self.assertEqual(self.tweet.liked_by.count(), count_former)
 
 
-# class TestUnLikeView(TestCase):
+class TestUnLikeView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", email="test@test.com", password="testpassword")
+        self.client.force_login(self.user)
+        self.tweet = Tweet.objects.create(user=self.user, content="testcontent")
+        self.tweet.liked_by.add(self.user)
 
-#     def test_success_post(self):
+    def test_success_post(self):
+        response = self.client.post(reverse("tweets:unlike", args=[self.tweet.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(self.tweet, self.user.liking.all())
 
-#     def test_failure_post_with_not_exist_tweet(self):
+    def test_failure_post_with_not_exist_tweet(self):
+        count_former = self.user.liking.count()
+        response = self.client.post(reverse("tweets:unlike", args=[100]))
 
-#     def test_failure_post_with_unliked_tweet(self):
+        self.assertTrue(response.status_code, 404)
+        self.assertEqual(self.user.liking.count(), count_former)
+
+    def test_failure_post_with_unliked_tweet(self):
+        self.tweet.liked_by.remove(self.user)
+        count_former = self.tweet.liked_by.count()
+        response = self.client.post(reverse("tweets:unlike", args=[self.tweet.pk]))
+
+        self.assertTrue(response.status_code, 200)
+        self.assertEqual(self.tweet.liked_by.count(), count_former)
