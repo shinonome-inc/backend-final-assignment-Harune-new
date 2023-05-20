@@ -10,7 +10,6 @@
 <h1>Tweet詳細</h1>
 <p><a href="{% url 'accounts:user_profile' tweet.user %}">{{ tweet.user }}</a> {{ tweet.created_at }}</p>
 <p>{{ tweet.content }}</p>
-{% if request.user == tweet.user %}
 <p>
     {% if tweet in liking_tweet_list %}
     <button onclick="changeLike(event)" data-is-liked="true" data-pk="{{ tweet.pk }}">❤︎</button>
@@ -18,7 +17,6 @@
     <button onclick="changeLike(event)" data-is-liked="false" data-pk="{{ tweet.pk }}">♡</button>
     {% endif %}
     <span id="{{ tweet.pk }}">{{ tweet.liked_by.count }}</span>
-    <a href="{% url 'tweets:delete' tweet.pk %}">削除</a>
+    {% if request.user == tweet.user %}<a href="{% url 'tweets:delete' tweet.pk %}">削除</a>{% endif %}
 </p>
-{% endif %}
 {% endblock %}
