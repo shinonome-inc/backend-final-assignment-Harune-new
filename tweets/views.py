@@ -14,7 +14,7 @@ class HomeView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["tweet_list"] = self.model.objects.select_related("user")
+        context["tweet_list"] = self.model.objects.select_related("user").prefetch_related("liked_by")
         context["liking_tweet_list"] = self.request.user.liking.all()
         return context
 
