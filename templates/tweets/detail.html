@@ -1,12 +1,24 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Detail{% endblock %}
+
+{% block js %}
+<script src="{% static 'js/like.js' %}"></script>{% endblock %}
 
 {% block content %}
 <h1>Tweet詳細</h1>
 <p><a href="{% url 'accounts:user_profile' tweet.user %}">{{ tweet.user }}</a> {{ tweet.created_at }}</p>
 <p>{{ tweet.content }}</p>
 {% if request.user == tweet.user %}
-<p><a href="{% url 'tweets:delete' tweet.pk %}">削除</a></p>
+<p>
+    {% if tweet in liking_tweet_list %}
+    <button onclick="changeLike(event)" data-is-liked="true" data-pk="{{ tweet.pk }}">❤︎</button>
+    {% else %}
+    <button onclick="changeLike(event)" data-is-liked="false" data-pk="{{ tweet.pk }}">♡</button>
+    {% endif %}
+    <span id="{{ tweet.pk }}">{{ tweet.liked_by.count }}</span>
+    <a href="{% url 'tweets:delete' tweet.pk %}">削除</a>
+</p>
 {% endif %}
 {% endblock %}

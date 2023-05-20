@@ -42,6 +42,7 @@ class UserProfileView(LoginRequiredMixin, DetailView):
         context["is_following"] = self.request.user.followings.filter(username=profile_user).exists()
         context["follower_count"] = profile_user.followers.count()
         context["following_count"] = profile_user.followings.count()
+        context["liking_tweet_list"] = self.request.user.liking.all()
         return context
 
 
