@@ -1,6 +1,8 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DeleteView, DetailView, ListView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, View
 
 from .forms import TweetCreateForm
 from .models import Tweet
@@ -9,7 +11,12 @@ from .models import Tweet
 class HomeView(LoginRequiredMixin, ListView):
     template_name = "tweets/home.html"
     model = Tweet
-    queryset = model.objects.select_related("user")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["tweet_list"] = self.model.objects.select_related("user").prefetch_related("liked_by")
+        context["liking_tweet_list"] = self.request.user.liking.all()
+        return context
 
 
 class TweetCreateView(LoginRequiredMixin, CreateView):
@@ -26,6 +33,11 @@ class TweetDetailView(LoginRequiredMixin, DetailView):
     template_name = "tweets/detail.html"
     model = Tweet
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["liking_tweet_list"] = self.request.user.liking.all()
+        return context
+
 
 class TweetDeleteView(UserPassesTestMixin, DeleteView):
     template_name = "tweets/delete.html"
@@ -34,3 +46,21 @@ class TweetDeleteView(UserPassesTestMixin, DeleteView):
 
     def test_func(self):
         return self.request.user == self.get_object().user
+
+
+class LikeView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        tweet = get_object_or_404(Tweet, pk=self.kwargs["pk"])
+        tweet.liked_by.add(self.request.user)
+
+        data = {"liked_by_count": tweet.liked_by.count()}
+        return JsonResponse(data)
+
+
+class UnlikeView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        tweet = get_object_or_404(Tweet, pk=self.kwargs["pk"])
+        tweet.liked_by.remove(self.request.user)
+
+        data = {"liked_by_count": tweet.liked_by.count()}
+        return JsonResponse(data)

@@ -6,3 +6,4 @@ class Tweet(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     content = models.TextField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
+    liked_by = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="liking")
