@@ -16,8 +16,12 @@ class FollowingFriendShipInline(admin.TabularInline):
     fk_name = "following"
 
 
+class LikingTweetInline(admin.TabularInline):
+    model = User.liking.through
+
+
 class UserAdmin(admin.ModelAdmin):
-    inlines = [FollowerFriendShipInline, FollowingFriendShipInline]
+    inlines = [FollowerFriendShipInline, FollowingFriendShipInline, LikingTweetInline]
 
 
 admin.site.register(User, UserAdmin)
