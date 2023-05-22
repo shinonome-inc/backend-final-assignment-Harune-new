@@ -38,7 +38,9 @@ class UserProfileView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         profile_user = self.object
-        context["tweet_list"] = Tweet.objects.select_related("user").filter(user=profile_user)
+        context["tweet_list"] = (
+            Tweet.objects.select_related("user").prefetch_related("liked_by").filter(user=profile_user)
+        )
         context["is_following"] = self.request.user.followings.filter(username=profile_user).exists()
         context["follower_count"] = profile_user.followers.count()
         context["following_count"] = profile_user.followings.count()
